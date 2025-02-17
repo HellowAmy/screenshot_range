@@ -1,0 +1,14 @@
+{
+    "format_name": "%1.png",
+    "format_picture": "PNG",
+    "order": 24,
+    "path": "./picture/",
+    "pos": {
+        "x": 698,
+        "y": 320
+    },
+    "size": {
+        "h": 415,
+        "w": 919
+    }
+}

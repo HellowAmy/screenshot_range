@@ -122,10 +122,6 @@ find_package(Qt5 COMPONENTS ${PRO_QT_PACK} REQUIRED)
 set(CMAKE_PREFIX_PATH $ENV{Qt5_DIR})
 # == Qt 配置 ==
 
-# 扩展库
-find_package(qxtglobalshortcut REQUIRED)
-link_libraries(qxtglobalshortcut)
-
 
 # 查找多线程
 find_package(Threads REQUIRED)

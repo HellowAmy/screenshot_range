@@ -17,7 +17,7 @@
 
 #include "Ffile.h"
 #include "Tlog.h"
-#include "qxtglobalshortcut/qxtglobalshortcut.h"
+#include "qxtglobalshortcut.h"
 
 main_window::main_window(QWidget *parent) : QWidget(parent)
 {

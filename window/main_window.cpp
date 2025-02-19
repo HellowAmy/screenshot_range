@@ -18,11 +18,13 @@
 
 #include "Ffile.h"
 #include "Tlog.h"
+#include "change_config.h"
 #include "qxtglobalshortcut.h"
 #include "rename_picture.h"
 
 main_window::main_window(QWidget *parent) : QWidget(parent)
 {
+
     this->setFixedWidth(250);
     this->setWindowIcon(QIcon("../config/pic/logo.png"));
 
@@ -46,14 +48,23 @@ main_window::main_window(QWidget *parent) : QWidget(parent)
     QPushButton *btn_rename = new QPushButton(this);
     btn_rename->setText("图片命名");
 
+    QPushButton *btn_reset_number = new QPushButton(this);
+    btn_reset_number->setText("重置序号");
+
+    QPushButton *btn_config = new QPushButton(this);
+    btn_config->setText("配置文件");
+
     QVBoxLayout *lay_main = new QVBoxLayout(this);
     lay_main->addWidget(_lab_tips);
     lay_main->addWidget(btn_pix_rect);
     lay_main->addWidget(btn_screenshot);
     lay_main->addWidget(btn_close_frame);
     lay_main->addWidget(btn_rename);
+    lay_main->addWidget(btn_reset_number);
+    lay_main->addWidget(btn_config);
 
     parse_data::read_json(_d, _file_json);
+    _frame->set_frame(QRect(QPoint(_d.pos.toq()), QSize(_d.size.toq())));
 
     QxtGlobalShortcut *shortcut = new QxtGlobalShortcut(this);
     if (shortcut->setShortcut(QKeySequence("F10")))
@@ -67,6 +78,8 @@ main_window::main_window(QWidget *parent) : QWidget(parent)
     connect(btn_screenshot, &QPushButton::clicked, this, &main_window::screenshot_save);
     connect(btn_close_frame, &QPushButton::clicked, this, &main_window::close_frame_display);
     connect(btn_rename, &QPushButton::clicked, this, &main_window::start_rename_wid);
+    connect(btn_reset_number, &QPushButton::clicked, this, &main_window::reset_number);
+    connect(btn_config, &QPushButton::clicked, this, &main_window::change_config_data);
 }
 
 main_window::~main_window()
@@ -111,11 +124,10 @@ void main_window::screenshot(config_data d)
 
 void main_window::screenshot_save()
 {
-    update_order();
     screenshot(_d);
-    parse_data::write_json(_d, _file_json);
-
     set_tips(QString("Save Picture %1").arg(_d.order));
+    update_order();
+    parse_data::write_json(_d, _file_json);
 }
 
 void main_window::save_choose_pic()
@@ -123,7 +135,6 @@ void main_window::save_choose_pic()
     auto rect = _wid_display->get_rect_choose();
     _d.pos.fromq(rect.topLeft());
     _d.size.fromq(rect.size());
-    screenshot_save();
     _frame->set_frame(rect);
     _frame->show();
 }
@@ -170,6 +181,27 @@ void main_window::start_rename_wid()
     });
 }
 
+void main_window::reset_number()
+{
+    _d.order = 1;
+    parse_data::write_json(_d, _file_json);
+    set_tips(QString("Now order is: %1").arg(_d.order));
+}
+
+void main_window::change_config_data()
+{
+    change_config *wid_config = new change_config(this);
+    wid_config->set_data(_d);
+    wid_config->show();
+
+    connect(wid_config, &rename_picture::accepted, this, [=]() {
+        _d = wid_config->get_data();
+        parse_data::write_json(_d, _file_json);
+        set_tips(QString("change config"));
+        qDebug() << "change config";
+    });
+}
+
 QStringList main_window::get_picture_ls()
 {
     QString path = QString::fromStdString(_d.path);
@@ -200,13 +232,13 @@ void main_window::rename_picture_path(const QString &path, const QStringList &ol
     for (int i = 0; i < old_name.size(); i++)
     {
         QString oldn = old_name[i];
-        QString tmn = oldn+tm;
+        QString tmn = oldn + tm;
         dir.rename(oldn, tmn);
     }
     for (int i = 0; i < old_name.size(); i++)
     {
         QString oldn = old_name[i];
-        QString tmn = oldn+tm;
+        QString tmn = oldn + tm;
         dir.rename(tmn, new_name[i]);
     }
 }

@@ -53,8 +53,8 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 
 # 调试模式
-set(CMAKE_BUILD_TYPE "Debug")
-# set(CMAKE_BUILD_TYPE "Release")
+# set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_BUILD_TYPE "Release")
 
 
 # 源文件 : 包含源文件

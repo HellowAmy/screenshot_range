@@ -31,6 +31,8 @@ public:
     void close_frame_display();
     void set_tips(const QString &txt);
     void start_rename_wid();
+    void reset_number();
+    void change_config_data();
 
     QStringList get_picture_ls();
     QStringList get_rename_ls();

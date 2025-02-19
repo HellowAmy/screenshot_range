@@ -22,11 +22,17 @@ void choose_range::set_frame(const QRect &rect)
     this->update();
 }
 
+void choose_range::update_col(QColor col)
+{
+    _col = col;
+    this->update();
+}
+
 void choose_range::paintEvent(QPaintEvent *event)
 {
     QPainter show(this);
     show.fillRect(rect(), Qt::transparent);
-    show.setPen(QPen(QColor("#B22222"), 2));
+    show.setPen(QPen(_col, 2));
     show.drawRect(rect());
     show.end();
 }

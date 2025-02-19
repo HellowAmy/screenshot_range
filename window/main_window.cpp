@@ -127,6 +127,7 @@ void main_window::screenshot_save()
     screenshot(_d);
     set_tips(QString("Save Picture %1").arg(_d.order));
     update_order();
+    update_frame_col();
     parse_data::write_json(_d, _file_json);
 }
 
@@ -200,6 +201,18 @@ void main_window::change_config_data()
         set_tips(QString("change config"));
         qDebug() << "change config";
     });
+}
+
+void main_window::update_frame_col()
+{
+    if (_d.order % 2 == 0)
+    {
+        _frame->update_col("#B22222");
+    }
+    else
+    {
+        _frame->update_col("#3CB371");
+    }
 }
 
 QStringList main_window::get_picture_ls()

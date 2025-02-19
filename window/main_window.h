@@ -33,6 +33,7 @@ public:
     void start_rename_wid();
     void reset_number();
     void change_config_data();
+    void update_frame_col();
 
     QStringList get_picture_ls();
     QStringList get_rename_ls();

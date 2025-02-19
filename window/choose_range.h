@@ -14,6 +14,7 @@ public:
     ~choose_range();
 
     void set_frame(const QRect &rect);
+    void update_col(QColor col);
 
 signals:
 
@@ -21,6 +22,7 @@ protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
+    QColor _col = "#B22222";
     QRect _rect;
 };
 #endif // CHOOSE_RANGE_H

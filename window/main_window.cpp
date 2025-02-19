@@ -24,6 +24,7 @@
 main_window::main_window(QWidget *parent) : QWidget(parent)
 {
     this->setFixedWidth(250);
+    this->setWindowIcon(QIcon("../config/pic/logo.png"));
 
     _wid_display = new process_picture;
     _frame = new choose_range;

@@ -30,6 +30,11 @@ public:
     void update_order();
     void close_frame_display();
     void set_tips(const QString &txt);
+    void start_rename_wid();
+
+    QStringList get_picture_ls();
+    QStringList get_rename_ls();
+    void rename_picture_path(const QString &path, const QStringList &old_name,const QStringList &new_name);
 
     static void screenshot_quick();
 
@@ -40,7 +45,8 @@ protected:
 
 private:    
     config_data _d;
-    std::string _file = "../config/config.json";
+    std::string _file_json = "../config/config.json";
+    std::string _file_rename = "../config/renamelist.txt";
 
     process_picture *_wid_display = nullptr;
     choose_range *_frame = nullptr;

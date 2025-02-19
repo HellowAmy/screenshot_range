@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDialog>
 #include <QDir>
 #include <QFile>
 #include <QHBoxLayout>
@@ -18,10 +19,10 @@
 #include "Ffile.h"
 #include "Tlog.h"
 #include "qxtglobalshortcut.h"
+#include "rename_picture.h"
 
 main_window::main_window(QWidget *parent) : QWidget(parent)
 {
-    // this->resize(200, 400);
     this->setFixedWidth(250);
 
     _wid_display = new process_picture;
@@ -41,13 +42,17 @@ main_window::main_window(QWidget *parent) : QWidget(parent)
     QPushButton *btn_close_frame = new QPushButton(this);
     btn_close_frame->setText("范围显示");
 
+    QPushButton *btn_rename = new QPushButton(this);
+    btn_rename->setText("图片命名");
+
     QVBoxLayout *lay_main = new QVBoxLayout(this);
     lay_main->addWidget(_lab_tips);
     lay_main->addWidget(btn_pix_rect);
     lay_main->addWidget(btn_screenshot);
     lay_main->addWidget(btn_close_frame);
+    lay_main->addWidget(btn_rename);
 
-    parse_data::read_json(_d, _file);
+    parse_data::read_json(_d, _file_json);
 
     QxtGlobalShortcut *shortcut = new QxtGlobalShortcut(this);
     if (shortcut->setShortcut(QKeySequence("F10")))
@@ -60,6 +65,7 @@ main_window::main_window(QWidget *parent) : QWidget(parent)
     connect(btn_pix_rect, &QPushButton::clicked, this, &main_window::screenshot_choose);
     connect(btn_screenshot, &QPushButton::clicked, this, &main_window::screenshot_save);
     connect(btn_close_frame, &QPushButton::clicked, this, &main_window::close_frame_display);
+    connect(btn_rename, &QPushButton::clicked, this, &main_window::start_rename_wid);
 }
 
 main_window::~main_window()
@@ -106,7 +112,7 @@ void main_window::screenshot_save()
 {
     update_order();
     screenshot(_d);
-    parse_data::write_json(_d, _file);
+    parse_data::write_json(_d, _file_json);
 
     set_tips(QString("Save Picture %1").arg(_d.order));
 }
@@ -143,6 +149,65 @@ void main_window::close_frame_display()
 void main_window::set_tips(const QString &txt)
 {
     _lab_tips->setText(txt);
+}
+
+void main_window::start_rename_wid()
+{
+    QString path = QString::fromStdString(_d.path);
+    QStringList old_name = get_picture_ls();
+    rename_picture *wid_rename = new rename_picture(this);
+    wid_rename->set_picture_path(path);
+    wid_rename->set_picture_list(old_name);
+    wid_rename->set_rename_list(get_rename_ls());
+    wid_rename->load_data();
+    wid_rename->show();
+
+    connect(wid_rename, &rename_picture::accepted, this, [=]() {
+        auto new_name = wid_rename->get_rename_list();
+        rename_picture_path(path, old_name, new_name);
+        qDebug() << "new name list: " << new_name;
+    });
+}
+
+QStringList main_window::get_picture_ls()
+{
+    QString path = QString::fromStdString(_d.path);
+    QDir dir(path);
+    auto ls_names = dir.entryList(QDir::NoDot | QDir::NoDotDot | QDir::Files);
+    return ls_names;
+}
+
+QStringList main_window::get_rename_ls()
+{
+    QStringList ls;
+    auto vec = parse_data::read_rename_list(_file_rename);
+    for (auto &a : vec)
+    {
+        ls.push_back(QString::fromStdString(a));
+    }
+    return ls;
+}
+
+void main_window::rename_picture_path(const QString &path, const QStringList &old_name, const QStringList &new_name)
+{
+    if (old_name.size() != new_name.size())
+    {
+        return;
+    }
+    QDir dir(path);
+    QString tm = ".tempswap";
+    for (int i = 0; i < old_name.size(); i++)
+    {
+        QString oldn = old_name[i];
+        QString tmn = oldn+tm;
+        dir.rename(oldn, tmn);
+    }
+    for (int i = 0; i < old_name.size(); i++)
+    {
+        QString oldn = old_name[i];
+        QString tmn = oldn+tm;
+        dir.rename(tmn, new_name[i]);
+    }
 }
 
 void main_window::screenshot_quick()

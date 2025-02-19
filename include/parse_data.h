@@ -5,8 +5,10 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
 
 #include "json.hpp"
+#include "Ffile.h"
 
 using namespace nlohmann;
 
@@ -71,6 +73,22 @@ struct parse_data
             return ofs.good();
         } catch(...){}
         return false;
+    }
+
+    static std::vector<std::string> read_rename_list(std::string path)
+    {
+        std::vector<std::string> vec;
+        std::fstream fs(path,std::ios::in);
+        if(fs.is_open())
+        {
+            std::string buf;
+            while(std::getline(fs, buf))
+            {
+                vec.push_back(buf);
+            }
+            fs.close();
+        }
+        return vec;
     }
 
 

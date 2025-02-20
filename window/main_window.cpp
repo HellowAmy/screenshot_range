@@ -219,7 +219,28 @@ QStringList main_window::get_picture_ls()
 {
     QString path = QString::fromStdString(_d.path);
     QDir dir(path);
-    auto ls_names = dir.entryList(QDir::NoDot | QDir::NoDotDot | QDir::Files);
+    auto ls_names = dir.entryList(QDir::NoDot | QDir::NoDotDot | QDir::Files, QDir::Name);
+    std::vector<QString> vec;
+    for (auto &a : ls_names)
+    {
+        vec.push_back(a);
+    }
+    std::sort(vec.begin(), vec.end(), [](const QString &a, const QString &b) {
+        bool oka = false;
+        bool okb = false;
+        int na = a.section(".", 0, 0).toInt(&oka);
+        int nb = b.section(".", 0, 0).toInt(&okb);
+        if (oka && okb)
+        {
+            return na < nb;
+        }
+        return a < b;
+    });
+    ls_names.clear();
+    for (auto &a : vec)
+    {
+        ls_names.push_back(a);
+    }
     return ls_names;
 }
 
